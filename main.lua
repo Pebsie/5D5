@@ -73,7 +73,7 @@ function newRoom()
                             y = y,
                             hp = love.math.random(math.floor(room/2),room),
                             atk = love.math.random(math.floor(room/2),atk),
-                            type = love.math.random(1,5)
+                            type = love.math.random(1,14)
                         }
                         enemy[#enemy].mhp = enemy[#enemy].hp
                     end
