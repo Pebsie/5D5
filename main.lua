@@ -10,6 +10,7 @@ room = 1
 enemy = {}
 
 map = {}
+lastMap = {}
 
 tutorialText = "Press WASD to move"
 
@@ -32,6 +33,7 @@ function newRoom()
             if x == 0 or x == 6 or y == 0 or y == 6 then -- border around the map
                 map[x][y] = "Wall"
             else
+                map[x][y] = "Floor"..tostring(love.math.random(1,4))
                 if love.math.random(1,50-room) == 1 then
                     map[x][y] = "Skeleton"
                 elseif love.math.random(1,150-room) == 1 then
@@ -40,8 +42,7 @@ function newRoom()
                     map[x][y] = "Pot"
                 elseif love.math.random(1,100-room) == 1 then
                       map[x][y] = "Statue"
-                else
-                    map[x][y] = "Floor"..tostring(love.math.random(1,4))
+             
                 end
 
                 if (room > 20 and love.math.random(1,4) == 1) or (love.math.random(1,30-room) == 1 and room ~= 1) then
@@ -143,13 +144,26 @@ function love.keypressed(key)
     
     end
 
-    if me.x == 8 or me.x == 0 and map[me.x][me.y] ~= "Open Door" then
+    if (me.x == 6 or me.x == 0) and map[me.x][me.y] ~= "Open Door" then
         me.x = originals[1]
     end
     if me.y == 6 or me.y == 0 and map[me.x][me.y] ~= "Open Door" then
         me.y = originals[2]
     end
-
+    if me.x == -1 then
+        room = room -1
+        map = lastMap
+        me.x = 5
+        map[me.x+1][me.y] = "Stuck Door"
+        enemy = {}
+    end
+    if me.y == 7 then
+        room = room -1
+        map = lastMap
+        me.y = 1
+        map[me.x][me.y-1] = "Stuck Door"
+        enemy = {}
+    end
 
     for i,v in ipairs(enemy) do
         if me.x == v.x and me.y == v.y then
@@ -173,6 +187,7 @@ function love.keypressed(key)
     end
 
     if me.x == 7 or me.y == -1 then
+        lastMap = map
         if me.x == 7 then
             me.x = 0
         elseif me.y == -1 then
@@ -212,6 +227,10 @@ function tick()
         end
         if v.x == me.x and v.y == me.y then
             me.hp = me.hp - v.atk
+            v.x = originals[1]
+            v.y = originals[2]
+        end
+        if v.x == 0 or v.x == 6 or v.y == 0 or v.y == 6 then
             v.x = originals[1]
             v.y = originals[2]
         end
