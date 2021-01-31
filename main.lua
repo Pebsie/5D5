@@ -73,8 +73,10 @@ function newRoom()
                         enemy[#enemy+1] = {
                             x = x,
                             y = y,
-                            hp = love.math.random(math.floor(room/1.5),room),
-                            atk = love.math.random(math.floor(room/1.5),atk),
+
+                            hp = love.math.random(me.lvl,me.atk*2),
+                            atk = love.math.random(room,room*2),
+
                             type = love.math.random(1,14)
                         }
                         enemy[#enemy].mhp = enemy[#enemy].hp
@@ -246,11 +248,7 @@ function love.keypressed(key)
                         me.xp = me.xp + 1
                     end
                     tutorialText = "+1 XP"
-                    if me.xp > me.lvl then
-                        me.xp = 0
-                        me.lvl = me.lvl + 1
-                        tutorialText = "Level up!"
-                    end
+                  
                     table.remove(enemy, i)
                 end
             end
@@ -261,10 +259,27 @@ function love.keypressed(key)
         me.atk = me.atk + love.math.random(1, me.lvl)
         map[me.x][me.y] = "Floor1"
         tutorialText = "1 ATK gained from Chest"
+        if me.atk > me.lvl then
+            me.atk = me.lvl
+            tutorialText = "Max ATK reached"
+            me.xp = me.xp + 1
+        end
+
     elseif map[me.x] and map[me.x][me.y] and map[me.x][me.y] == "Pot" then
         me.hp = me.hp + love.math.random(1, room+me.lvl)
         map[me.x][me.y] = "Floor1"
         tutorialText = room.." HP gained from Pot"
+        if me.hp > me.lvl*10 then
+            me.hp = me.lvl*10
+            tutorialText = "Max HP reached"
+            me.xp = me.xp + 1
+        end
+    end
+
+    if me.xp > me.lvl then
+        me.xp = 0
+        me.lvl = me.lvl + 1
+        tutorialText = "Level up!"
     end
 
     if me.x == 7 or me.y == -1 then
