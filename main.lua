@@ -2,9 +2,7 @@ me = {
     x = 0,
     y = 3,
     hp = 10,
-    atk = 1,
-    xp = 0,
-    lvl = 1
+    atk = 1
 }
 
 room = 1
@@ -26,16 +24,9 @@ function newRoom()
         tutorialText = "Chests increase ATK"
     elseif room == 5 then
         tutorialText = "Pots give HP"
-    elseif room == 7 then
-        tutorialText = "Enemies give 1 XP"
-    elseif room == 8 then
-        tutorialText = "Lv increase chest ATK"
     end
     map = {}
     enemy = {}
-
-    roomType = "normal"
-    if love.math.random(1,10) == 1 then roomType = "treasure" tutorialText = "**TREASURE ROOM**" end
     for x = 0, 6 do
         map[x] = {}
         for y = 0, 6 do
@@ -43,40 +34,26 @@ function newRoom()
                 map[x][y] = "Wall"
             else
                 map[x][y] = "Floor"..tostring(love.math.random(1,4))
-                if roomType == "treasure" then
-                    -- TREASURE ROOM WOOO
-                    map[x][y] = "Carpet"
-                    if love.math.random(1,5) == 1 then
-                        map[x][y] = "Chest"
-                    elseif love.math.random(1,5) == 1 then
-                        map[x][y] = "Pot"
-                    elseif love.math.random(1,8) == 1 then
-                        map[x][y] = "Statue"
-                    end
-                else
-                    
-                    if love.math.random(1,50-room) == 1 then
-                        map[x][y] = "Skeleton"
-                    elseif love.math.random(1,150-room) == 1 then
-                        map[x][y] = "Chest"
-                    elseif love.math.random(1,50-room) == 1 then
-                        map[x][y] = "Pot"
-                    elseif love.math.random(1,100-room) == 1 then
-                        map[x][y] = "Statue"
-                    elseif love.math.random(1,25) == 1 then
-                        map[x][y] = "Lever"
-                    end
+                if love.math.random(1,50-room) == 1 then
+                    map[x][y] = "Skeleton"
+                elseif love.math.random(1,150-room) == 1 then
+                    map[x][y] = "Chest"
+                elseif love.math.random(1,50-room) == 1 then
+                    map[x][y] = "Pot"
+                elseif love.math.random(1,100-room) == 1 then
+                      map[x][y] = "Statue"
+             
+                end
 
-                    if (room > 20 and love.math.random(1,20) == 1) or (love.math.random(1,30-room) == 1 and room ~= 1) then
-                        enemy[#enemy+1] = {
-                            x = x,
-                            y = y,
-                            hp = love.math.random(math.floor(room/2),room),
-                            atk = love.math.random(math.floor(room/2),atk),
-                            type = love.math.random(1,14)
-                        }
-                        enemy[#enemy].mhp = enemy[#enemy].hp
-                    end
+                if (room > 20 and love.math.random(1,4) == 1) or (love.math.random(1,30-room) == 1 and room ~= 1) then
+                    enemy[#enemy+1] = {
+                        x = x,
+                        y = y,
+                        hp = love.math.random(math.floor(room/2),room),
+                        atk = love.math.random(math.floor(room/2),atk),
+                        type = love.math.random(1,5)
+                    }
+                    enemy[#enemy].mhp = enemy[#enemy].hp
                 end
             end
         end
@@ -104,8 +81,6 @@ love.graphics.setDefaultFilter( "nearest", "nearest" )
         Floor4 = love.graphics.newImage("assets/floor4.png"),
         Chest = love.graphics.newImage("assets/chest.png"),
         Door = love.graphics.newImage("assets/door.png"),
-        Carpet = love.graphics.newImage("assets/carpet.png"),
-        Lever = love.graphics.newImage("assets/lever.png"),
         ["Open Door"] = love.graphics.newImage("assets/door_open.png"),
         ["Stuck Door Open"] = love.graphics.newImage("assets/door_open.png"),
         ["Stuck Door"] = love.graphics.newImage("assets/door.png"),
@@ -116,21 +91,12 @@ love.graphics.setDefaultFilter( "nearest", "nearest" )
             love.graphics.newImage("assets/monster3.png"),
             love.graphics.newImage("assets/monster4.png"),
             love.graphics.newImage("assets/monster5.png"),
-            love.graphics.newImage("assets/monster6.png"),
-            love.graphics.newImage("assets/monster7.png"),
-            love.graphics.newImage("assets/monster8.png"),
-            love.graphics.newImage("assets/monster9.png"),
-            love.graphics.newImage("assets/monster10.png"),
-            love.graphics.newImage("assets/monster11.png"),
-            love.graphics.newImage("assets/monster12.png"),
-            love.graphics.newImage("assets/monster13.png"),
-            love.graphics.newImage("assets/monster14.png"),
         }
     }
 
     newRoom()
 
-    love.graphics.setFont(love.graphics.newFont(8))
+    love.graphics.setFont(love.graphics.newFont("assets/BMmini.TTF", 8))
 end
 
 function love.draw()
@@ -146,11 +112,7 @@ function love.draw()
             end
         end
 
-        if me.hp < room then
-            love.graphics.setColor(1,0,0)
-        end
         love.graphics.draw(assets.Player, me.x*16,me.y*16)
-        love.graphics.setColor(1,1,1)
 
         for i,v in ipairs(enemy) do
             love.graphics.draw(assets.Monster[v.type], v.x*16, v.y*16)
@@ -159,8 +121,8 @@ function love.draw()
             love.graphics.setColor(1,1,1)
         end
 
-        love.graphics.print("Room "..room.."\n"..me.hp.." HP\n"..me.atk.." ATK\nLv "..me.lvl.."\n"..me.xp.." XP")
-        love.graphics.print(tutorialText, 0,16*6)
+        love.graphics.print("Room "..room.."\n"..me.hp.." HP\n"..me.atk.." ATK", 2, 2)
+        love.graphics.print(tutorialText, 0,16*6, 2, 2)
     end
     love.graphics.pop()
 end
@@ -182,72 +144,65 @@ function love.keypressed(key)
     
     end
 
-    if (me.x == 6 or me.x == 0) and map[me.x][me.y] ~= "Open Door" then
-        me.x = originals[1]
-    end
-    if me.y == 6 or me.y == 0 and map[me.x][me.y] ~= "Open Door" then
-        me.y = originals[2]
-    end
-    if me.x == -1 then
-        room = room -1
-        map = lastMap
-        me.x = 5
-        map[me.x+1][me.y] = "Stuck Door"
-        enemy = {}
-    end
-    if me.y == 7 then
-        room = room -1
-        map = lastMap
-        me.y = 1
-        map[me.x][me.y-1] = "Stuck Door"
-        enemy = {}
-    end
+    
 
-    if not love.keyboard.isDown("lshift") then
+    if key == "w" or key == "s" or key == "a" or key == "d"  then 
+        if (me.x == 6 or me.x == 0) and map[me.x][me.y] ~= "Open Door" then
+            me.x = originals[1]
+        end
+        if me.y == 6 or me.y == 0 and map[me.x][me.y] ~= "Open Door" then
+            me.y = originals[2]
+        end
+        if me.x == -1 then
+            room = room -1
+            map = lastMap
+            me.x = 5
+            map[me.x+1][me.y] = "Stuck Door"
+            enemy = {}
+        end
+        if me.y == 7 then
+            room = room -1
+            map = lastMap
+            me.y = 1
+            map[me.x][me.y-1] = "Stuck Door"
+            enemy = {}
+        end
+
         for i,v in ipairs(enemy) do
             if me.x == v.x and me.y == v.y then
                 v.hp = v.hp - me.atk
-                if me.hp < room then
-                    tutorialText = "HP is low"
-                end
                 me.x = originals[1]
                 me.y = originals[2]
                 if v.hp <= 0 then
-                    me.xp = me.xp + 1
-                    tutorialText = "+1 XP"
-                    if me.xp > me.lvl then
-                        me.xp = 0
-                        me.lvl = me.lvl + 1
-                        tutorialText = "Level up!"
-                    end
                     table.remove(enemy, i)
                 end
             end
         end
-    end
 
-    if map[me.x] and map[me.x][me.y] and map[me.x][me.y] == "Chest" then
-        me.atk = me.atk + love.math.random(1, me.lvl)
-        map[me.x][me.y] = "Floor1"
-        tutorialText = "1 ATK gained from Chest"
-    elseif map[me.x] and map[me.x][me.y] and map[me.x][me.y] == "Pot" then
-        me.hp = me.hp + love.math.random(1, room+me.lvl)
-        map[me.x][me.y] = "Floor1"
-        tutorialText = room.." HP gained from Pot"
-    end
-
-    if me.x == 7 or me.y == -1 then
-        lastMap = map
-        if me.x == 7 then
-            me.x = 0
-        elseif me.y == -1 then
-            me.y = 6
+        if map[me.x] and map[me.x][me.y] and map[me.x][me.y] == "Chest" then
+            me.atk = me.atk + 1
+            map[me.x][me.y] = "Floor1"
+            tutorialText = "1 ATK gained from Chest"
+        elseif map[me.x] and map[me.x][me.y] and map[me.x][me.y] == "Pot" then
+            me.hp = me.hp + room
+            map[me.x][me.y] = "Floor1"
+            tutorialText = room.." HP gained from Pot"
         end
-        newRoom()
-        room = room + 1
-    end
 
-    tick()
+        if me.x == 7 or me.y == -1 then
+            lastMap = map
+            if me.x == 7 then
+                me.x = 0
+            elseif me.y == -1 then
+                me.y = 6
+            end
+            newRoom()
+            room = room + 1
+        end
+        
+        tick()
+    end
+    
 end
 
 function tick() 
@@ -255,9 +210,8 @@ function tick()
     for x = 0,6 do
         for y = 0, 6 do
             if map[x][y] == "Door" then
-                if #enemy == 0 or map[me.x][me.y] == "Lever" then
+                if #enemy == 0 then
                     map[x][y] = "Open Door"
-                    tutorialText = "Doors opened"
                 end
             elseif map[x][y] == "Stuck Door Open" and (me.x ~= x or me.y ~= y) then
                 map[x][y] = "Stuck Door"
