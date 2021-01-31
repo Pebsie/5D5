@@ -13,6 +13,7 @@ enemy = {}
 
 map = {}
 lastMap = {}
+order = {}
 
 tutorialText = "Press WASD to move"
 
@@ -36,6 +37,7 @@ function newRoom()
 
     roomType = "normal"
     if love.math.random(1,10) == 1 then roomType = "treasure" tutorialText = "**TREASURE ROOM**" end
+    if love.math.random(1,10) == 1 then roomType = "boss" tutorialText = "**BOSS ROOM**" end
     for x = 0, 6 do
         map[x] = {}
         for y = 0, 6 do
@@ -46,9 +48,9 @@ function newRoom()
                 if roomType == "treasure" then
                     -- TREASURE ROOM WOOO
                     map[x][y] = "Carpet"
-                    if love.math.random(1,5) == 1 then
+                    if love.math.random(1,10) == 1 then
                         map[x][y] = "Chest"
-                    elseif love.math.random(1,5) == 1 then
+                    elseif love.math.random(1,10) == 1 then
                         map[x][y] = "Pot"
                     elseif love.math.random(1,8) == 1 then
                         map[x][y] = "Statue"
@@ -67,12 +69,12 @@ function newRoom()
                         map[x][y] = "Lever"
                     end
 
-                    if (room > 20 and love.math.random(1,20) == 1) or (love.math.random(1,30-room) == 1 and room ~= 1) then
+                    if love.math.random(1,20) == 1 or (roomType == "boss" and love.math.random(1,5) == 1) then
                         enemy[#enemy+1] = {
                             x = x,
                             y = y,
-                            hp = love.math.random(math.floor(room/2),room),
-                            atk = love.math.random(math.floor(room/2),atk),
+                            hp = love.math.random(math.floor(room/1.5),room),
+                            atk = love.math.random(math.floor(room/1.5),atk),
                             type = love.math.random(1,14)
                         }
                         enemy[#enemy].mhp = enemy[#enemy].hp
@@ -138,6 +140,30 @@ function love.draw()
    love.graphics.scale(love.graphics.getWidth()/(16*7), love.graphics.getHeight()/(16*7))  
    if me.hp < 0 then
     love.graphics.print("Dead.\nYou got to room "..room)
+    local mx = 0
+    local my = 16*6
+    for i = 1, #order do
+        love.graphics.setColor(1,1,1)
+        if order[i] == "up" then
+            my = my - 1
+        elseif order[i] == "right" then
+            mx = mx + 1
+        elseif order[i] == "up-nah" then
+            my = my -1
+            love.graphics.setColor(1,0,0)
+        elseif order[i] == "right-nah" then
+            mx = mx + 1
+            love.graphics.setColor(1,0,0)
+        end
+        love.graphics.rectangle("fill",mx,my,1,1)
+        if order[i] == "up-nah" then
+            my = my +1
+    
+        elseif order[i] == "right-nah" then
+            mx = mx - 1
+     
+        end
+     end
    else
         for x = 0,6 do
             for y = 0, 6 do
@@ -194,6 +220,7 @@ function love.keypressed(key)
         me.x = 5
         map[me.x+1][me.y] = "Stuck Door"
         enemy = {}
+        order[#order] = "right-nah"
     end
     if me.y == 7 then
         room = room -1
@@ -201,6 +228,7 @@ function love.keypressed(key)
         me.y = 1
         map[me.x][me.y-1] = "Stuck Door"
         enemy = {}
+        order[#order] = "up-nah"
     end
 
     if not love.keyboard.isDown("lshift") then
@@ -214,6 +242,9 @@ function love.keypressed(key)
                 me.y = originals[2]
                 if v.hp <= 0 then
                     me.xp = me.xp + 1
+                    if roomType == "boss" then
+                        me.xp = me.xp + 1
+                    end
                     tutorialText = "+1 XP"
                     if me.xp > me.lvl then
                         me.xp = 0
@@ -240,8 +271,10 @@ function love.keypressed(key)
         lastMap = map
         if me.x == 7 then
             me.x = 0
+            order[#order+1] = "right"
         elseif me.y == -1 then
             me.y = 6
+            order[#order+1] = "up"
         end
         newRoom()
         room = room + 1
